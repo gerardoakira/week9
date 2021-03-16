@@ -18,6 +18,19 @@ firebase.auth().onAuthStateChanged(async function(user) {
       event.preventDefault()
       let postUsername = user.displayName
       let postImageUrl = document.querySelector('#image-url').value
+
+      let response = await fetch('/.netlify/functions/create_post', {
+        method: 'POST',
+        body: JSON.stringify({
+          userId: user.uid,
+          imageUrl: postImageUrl,
+          username: postUsername
+          
+        })
+      })
+
+      let post = await response.json()
+
       // 🔥🔥🔥 Lab
       // Step 1:   POST fetch the create_post endpoint. Send the currently logged-in
       //           user's uid and username, and the image URL from the form in the 
@@ -109,12 +122,22 @@ async function renderPost(post) {
 
     // 🔥🔥🔥 Code-Along
     // POST fetch the like endpoint and test for success
+    let response = await fetch('/.netlify/functions/like',{
+      method: 'POST',
+      body: JSON.stringify({
+        postId: postId,
+        userId: currentUserId
+      })
+    })
     // 🔥🔥🔥 End Code-Along
 
+    if (response.ok) {
     let existingNumberOfLikes = document.querySelector(`.post-${postId} .likes`).innerHTML
     let newNumberOfLikes = parseInt(existingNumberOfLikes) + 1
     document.querySelector(`.post-${postId} .likes`).innerHTML = newNumberOfLikes
+    }
   })
+
 
   // listen for the post comment button on this post
   let postCommentButton = document.querySelector(`.post-${postId} .post-comment-button`)

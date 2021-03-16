@@ -4,6 +4,28 @@ let firebase = require('./firebase')
 exports.handler = async function(event) {
   let db = firebase.firestore()
   
+  let body = JSON.parse(event.body)
+  console.log(event)
+  
+  let userId = body.userId
+  let imageUrl = body.imageUrl
+  let username = body.username
+
+  console.log(`post id is ${username}`)
+  console.log(`user id is ${userId}`)
+  console.log(`user id is ${imageUrl}`)
+
+  let post = {
+    username: username,
+    userId: userId,
+    imageUrl: imageUrl,
+    created: firebase.firestore.FieldValue.serverTimestamp()
+  }
+
+  let docref = await db.collection('posts').add(post)
+  post.id = docref.id
+  post.likes = 0
+
   // 🔥🔥🔥 Lab
   // Step 2: Parse out the post data, i.e. the event.body – pull out 
   //         the user ID, username, and image URL that is provided
@@ -21,7 +43,7 @@ exports.handler = async function(event) {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({})
+    body: JSON.stringify(post)
   }
 
 }
